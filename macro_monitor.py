@@ -14,7 +14,12 @@ import subprocess
 # -------------------------------------------------------------------
 # 운영체제 구분 (Windows vs Linux)
 # -------------------------------------------------------------------
-IS_WINDOWS = sys.platform.startswitch('win')
+IS_WINDOWS = sys.platform.startswith('win')
+
+if IS_WINDOWS:
+    # 윈도우 디스플레이 배율(125%, 150% 등)로 인해 폰트가 커지는 현상 방지 (DPI 고정)
+    os.environ["GDK_DPI_SCALE"] = "1.0"
+    os.environ["GDK_SCALE"] = "1.0"
 
 # -------------------------------------------------------------------
 # Weston / Wayland 디스플레이 환경 변수 자동 설정
@@ -27,8 +32,8 @@ if not IS_WINDOWS:
     except Exception:
         os.environ["XDG_RUNTIME_DIR"] = "/run/user/1000"
 
-os.environ["GDK_BACKEND"] = "wayland"
-os.environ["WAYLAND_DISPLAY"] = "wayland-0"
+    os.environ["GDK_BACKEND"] = "wayland"
+    os.environ["WAYLAND_DISPLAY"] = "wayland-0"
 
 import json
 import time
@@ -50,7 +55,11 @@ from gi.repository import Gtk, Gdk, GLib, Pango
 # -------------------------------------------------------------------
 # CONFIG & CONSTANTS
 # -------------------------------------------------------------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# PyInstaller 실행 파일(.exe)인 경우 sys.executable 경로 사용
+if getattr(sys, 'frozen', False):
+    BASE_DIR = os.path.dirname(os.path.abspath(sys.executable))
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(BASE_DIR, "config.ini")
 
 # 기본 색상 정의 (Hex)
@@ -132,8 +141,17 @@ def get_weather_korean(code):
 class MacroMonitor(Gtk.Window):
     def __init__(self):
         super().__init__(title="Macro Monitor")
-        self.set_decorated(False)
-        self.maximize()
+
+        if IS_WINDOWS:
+            # 윈도우에서는 창 틀을 유지하고 480x272 고정 크기로 생성
+            self.set_size_request(480, 272)
+            self.set_resizable(False)  # 창 크기 조절 방지
+        else:
+            # STM32MP1(리눅스)에서는 창 틀 없이 화면 전체 채우기
+            self.set_decorated(False)
+            self.maximize()
+        #self.set_decorated(False)
+        #self.maximize()
 
         self.config = configparser.ConfigParser()
         self.load_config()
@@ -161,11 +179,12 @@ class MacroMonitor(Gtk.Window):
         # 초기 수집 실행
         threading.Thread(target=self.refresh_all_data, daemon=True).start()
 
-        # pkill -SIGUSR1 명령용 시그널 등록
-        signal.signal(signal.SIGUSR1, self.handle_capture_signal)
+        if not IS_WINDOWS:
+            # pkill -SIGUSR1 명령용 시그널 등록
+            signal.signal(signal.SIGUSR1, self.handle_capture_signal)
 
-        # 터미널 키보드 Ctrl + \ (SIGQUIT) 가로채기 등록
-        signal.signal(signal.SIGQUIT, self.handle_capture_signal)
+            # 터미널 키보드 Ctrl + \ (SIGQUIT) 가로채기 등록
+            signal.signal(signal.SIGQUIT, self.handle_capture_signal)
 
     # ---------------------------------------------------------------
     # 백라이트 sysfs 경로 검색 및 제어(STM32MP135F-DK 전용) 

@@ -40,7 +40,7 @@
 ST OpenSTLinux - Weston - (A Yocto Project Based Distro) 5.0.15-openstlinux-6.6-yocto-scarthgap-mpu-v26.02.18
 윈도우용은 확인중 입니다.
 
-#### 필수 설치 스크립트 실행 (`deploy_stm32mp1/install.sh`)
+#### 필수 설치 스크립트 실행 (`install_stm32mp1/install.sh`)
 의존성 패키지 설치부터 부팅 시 자동 실행을 위한 `systemd` 서비스 등록까지 한 번에 완료됩니다.
 
 ```bash
@@ -48,3 +48,8 @@ git clone [https://github.com/lib-birdbell/macro-monitor.git](https://github.com
 cd macro-monitor/install_stm32mp1
 chmod +x install.sh
 sudo ./install.sh
+
+### 2. Windows (10 / 11)
+Releases 에서 받은 파일을 실행합니다.
+글씨 비율이 안맞을때는, 시스템 > 디스플레이에서 배율을 100%로 설정합니다.
+
