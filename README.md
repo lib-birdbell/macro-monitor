@@ -48,6 +48,7 @@ git clone [https://github.com/lib-birdbell/macro-monitor.git](https://github.com
 cd macro-monitor/install_stm32mp1
 chmod +x install.sh
 sudo ./install.sh
+```
 
 ### 2. Windows (10 / 11)
 Releases 에서 받은 파일을 실행합니다.
