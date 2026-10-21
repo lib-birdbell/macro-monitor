@@ -50,6 +50,10 @@ chmod +x install.sh
 sudo ./install.sh
 ```
 
+폰트  
+/usr/share/fonts/truetype 에 malgun.ttf malgunbd.ttf malgunsl.ttf 를 설치 해야 합니다.  
+해당 폰트는 윈도우에 있습니다.(또는 웹에서 찾을 수 있습니다.)  
+
 ### 2. Windows (10 / 11)
 Releases 에서 받은 파일을 실행합니다.  
 글씨 비율이 안맞을때는, 시스템 > 디스플레이에서 배율을 100%로 설정합니다.
